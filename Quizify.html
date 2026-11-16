@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quizify</title>
+  <style>
+    :root {
+      --bg: #f4f5fa;
+      --card: #fff;
+      --side: #f1f3f9;
+      --ink: #141b34;
+      --mut: #5b6480;
+      --line: #dfe3ee;
+      --pri: #1f4fd8;
+      --pri2: #e8eefc;
+      --field: #f4f6fb;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      color-scheme: light
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0e1220;
+        --card: #171c2e;
+        --side: #131828;
+        --ink: #eef1fb;
+        --mut: #9aa3bf;
+        --line: #2a3150;
+        --pri: #5b86ff;
+        --pri2: #1e2748;
+        --field: #1d2338;
+        color-scheme: dark
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0e1220;
+      --card: #171c2e;
+      --side: #131828;
+      --ink: #eef1fb;
+      --mut: #9aa3bf;
+      --line: #2a3150;
+      --pri: #5b86ff;
+      --pri2: #1e2748;
+      --field: #1d2338;
+      color-scheme: dark
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      min-height: 100vh
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      color: inherit
+    }
+
+    a {
+      color: var(--pri);
+      cursor: pointer
+    }
+
+    .hide {
+      display: none !important
+    }
+
+    .btn {
+      background: var(--pri);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: .8rem 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      gap: .5rem;
+      align-items: center;
+      justify-content: center
+    }
+
+    .btn:hover {
+      filter: brightness(1.08)
+    }
+
+    .btn.ghost {
+      background: var(--card);
+      color: var(--pri);
+      border: 1.5px solid var(--pri)
+    }
+
+    .btn.line {
+      background: var(--field);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      font-weight: 600
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--pri);
+      outline-offset: 2px
+    }
+
+    .field {
+      width: 100%;
+      background: var(--field);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: .85rem 1rem
+    }
+
+    .theme {
+      position: fixed;
+      top: calc(18px + env(safe-area-inset-top, 0px));
+      left: 18px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 0;
+      background: var(--card);
+      box-shadow: 0 4px 14px #0002;
+      cursor: pointer;
+      font-size: 1.2rem;
+      z-index: 5
+    }
+
+    /* login */
+    #login {
+      padding: 4.5rem 1rem 2rem
+    }
+
+    .auth {
+      max-width: 1230px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 7fr 8fr;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: 0 10px 40px #0001
+    }
+
+    .auth .l {
+      background: var(--side);
+      padding: 3.5rem 3.5rem 2.5rem;
+      display: flex;
+      flex-direction: column
+    }
+
+    .auth .r {
+      padding: 6rem 7rem
+    }
+
+    .brand {
+      display: flex;
+      gap: .7rem;
+      align-items: center;
+      font-weight: 800;
+      color: var(--pri)
+    }
+
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: var(--pri);
+      color: #fff;
+      display: grid;
+      place-items: center
+    }
+
+    .eyebrow {
+      letter-spacing: .2em;
+      font-size: .78rem;
+      font-weight: 800;
+      color: var(--pri);
+      margin: 3.2rem 0 .8rem
+    }
+
+    h1 {
+      font-size: 2.7rem;
+      line-height: 1.08;
+      margin: 0 0 1.2rem;
+      letter-spacing: -.02em
+    }
+
+    .l p.sub {
+      color: var(--mut);
+      margin: 0 0 2.5rem
+    }
+
+    .feat {
+      display: flex;
+      gap: 1.1rem;
+      margin-bottom: 1.6rem
+    }
+
+    .feat b {
+      display: block
+    }
+
+    .feat span {
+      color: var(--mut)
+    }
+
+    .feat i {
+      font-style: normal;
+      color: var(--pri);
+      font-size: 1.4rem
+    }
+
+    .foot {
+      margin-top: auto;
+      border-top: 1px solid var(--line);
+      padding-top: 1.4rem;
+      font-size: .85rem
+    }
+
+    .r h2 {
+      font-size: 2rem;
+      margin: 1.6rem 0 .3rem
+    }
+
+    .r .mut {
+      color: var(--mut);
+      margin: 0 0 1.8rem
+    }
+
+    .or {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--mut);
+      font-size: .8rem;
+      margin: 1.5rem 0
+    }
+
+    .or:before,
+    .or:after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line)
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 1.1rem 0 .5rem
+    }
+
+    .pw {
+      position: relative
+    }
+
+    .pw button {
+      position: absolute;
+      right: .8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: 0;
+      cursor: pointer
+    }
+
+    .err {
+      color: #d23b3b;
+      font-size: .9rem;
+      margin: .6rem 0 0;
+      min-height: 1.2em
+    }
+
+    .auth-note {
+      display: block;
+      color: var(--mut);
+      margin-top: .8rem;
+      text-align: center
+    }
+
+    @media(max-width:900px) {
+      .auth {
+        grid-template-columns: 1fr
+      }
+
+      .auth .r {
+        padding: 2.5rem 1.5rem
+      }
+
+      .auth .l {
+        padding: 2rem 1.5rem
+      }
+
+      h1 {
+        font-size: 2rem
+      }
+    }
+
+    /* app */
+    #app {
+      display: grid;
+      grid-template-columns: 288px 1fr;
+      min-height: 100vh
+    }
+
+    aside {
+      background: var(--side);
+      border-right: 1px solid var(--line);
+      padding: 1.1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+      position: sticky;
+      top: 0;
+      height: 100vh
+    }
+
+    aside .brand small {
+      display: block;
+      color: var(--mut);
+      font-weight: 500
+    }
+
+    .nav {
+      display: flex;
+      gap: .8rem;
+      align-items: center;
+      padding: .8rem 1rem;
+      border-radius: 10px;
+      border: 0;
+      background: none;
+      color: var(--mut);
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      width: 100%
+    }
+
+    .nav.on {
+      background: var(--pri2);
+      color: var(--pri);
+      border: 1px solid var(--line)
+    }
+
+    .nav:hover {
+      background: var(--pri2)
+    }
+
+    .sp {
+      flex: 1
+    }
+
+    main {
+      padding: 1.2rem 2rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 264px;
+      gap: 1.5rem;
+      align-content: start
+    }
+
+    .head {
+      grid-column: 1/-1;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start
+    }
+
+    .head h2 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: -.01em
+    }
+
+    .head p {
+      margin: .2rem 0 0;
+      color: var(--mut)
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.2rem
+    }
+
+    .stor {
+      min-width: 270px;
+      font-size: .85rem
+    }
+
+    .stor div {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 9px;
+      background: var(--field);
+      margin-top: .6rem;
+      overflow: hidden
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--pri)
+    }
+
+    .up {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 1.8rem
+    }
+
+    .drop {
+      text-align: center;
+      border-radius: 10px;
+      padding: .5rem;
+      transition: .15s
+    }
+
+    .drop.over {
+      background: var(--pri2)
+    }
+
+    .drop .ic {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: var(--pri2);
+      color: var(--pri);
+      display: grid;
+      place-items: center;
+      margin: 0 auto 1rem;
+      font-size: 1.4rem
+    }
+
+    .drop h3 {
+      margin: 0 0 .5rem
+    }
+
+    .drop p {
+      color: var(--mut);
+      margin: 0 0 1rem
+    }
+
+    .opts {
+      border-left: 1px solid var(--line);
+      padding-left: 2rem
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem
+    }
+
+    .opts label {
+      margin: 0 0 .4rem
+    }
+
+    .opts small {
+      color: var(--mut);
+      display: block;
+      margin-top: .9rem
+    }
+
+    .mats {
+      grid-column: 1
+    }
+
+    .side {
+      grid-column: 2;
+      grid-row: 2/4;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem
+    }
+
+    .sec {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1.4rem 0 .8rem
+    }
+
+    .sec h3 {
+      margin: 0;
+      font-size: 1.3rem
+    }
+
+    .pill {
+      background: var(--field);
+      border-radius: 6px;
+      padding: .2rem .6rem;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--mut)
+    }
+
+    .empty {
+      border: 1.5px dashed var(--line);
+      border-radius: 14px;
+      text-align: center;
+      padding: 4.5rem 1rem;
+      background: var(--field)
+    }
+
+    .empty b {
+      display: block
+    }
+
+    .empty span {
+      color: var(--mut)
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: .9rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+      margin-bottom: .6rem
+    }
+
+    .row small {
+      color: var(--mut);
+      display: block
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      color: var(--mut);
+      font-size: .85rem;
+      margin: .6rem 0
+    }
+
+    .stat b {
+      color: var(--pri)
+    }
+
+    .tk h3 {
+      font-size: 1.4rem;
+      line-height: 1.2;
+      margin: .8rem 0
+    }
+
+    .tk p {
+      color: var(--mut)
+    }
+
+    .view {
+      display: none;
+      grid-column: 1/-1
+    }
+
+    .view.on {
+      display: block
+    }
+
+    .q {
+      margin-bottom: 1rem
+    }
+
+    .q h4 {
+      margin: 0 0 .7rem
+    }
+
+    .o {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: .7rem 1rem;
+      border: 1px solid var(--line);
+      background: var(--field);
+      border-radius: 8px;
+      margin-bottom: .4rem;
+      cursor: pointer
+    }
+
+    .o.ok {
+      border-color: #1a9a5a;
+      background: #1a9a5a22
+    }
+
+    .o.bad {
+      border-color: #d23b3b;
+      background: #d23b3b22
+    }
+
+    .toast {
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: var(--bg);
+      padding: .7rem 1.1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      z-index: 9
+    }
+
+    @media(max-width:1100px) {
+      main {
+        grid-template-columns: 1fr
+      }
+
+      .side {
+        grid-column: 1;
+        grid-row: auto
+      }
+
+      .up {
+        grid-template-columns: 1fr
+      }
+
+      .opts {
+        border: 0;
+        padding: 0
+      }
+    }
+
+    @media(max-width:800px) {
+      #app {
+        grid-template-columns: 1fr
+      }
+
+      aside {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap
+      }
+
+      .sp {
+        display: none
+      }
+
+      main {
+        padding: 1rem
+      }
+
+      .head {
+        flex-direction: column
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <button class="theme" id="theme" aria-label="Toggle color mode">☾</button>
+
+  <section id="login">
+    <div class="auth">
+      <div class="l">
+        <div class="brand"><span class="logo">✎</span>Quizify</div>
+        <div class="eyebrow">YOUR ACADEMIC WORKSPACE</div>
+        <h1>Study from your own material, with less friction.</h1>
+        <p class="sub">Turn lectures and notes into focused practice, then return to your exact place on any device.</p>
+        <div class="feat"><i>▯</i>
+          <div><b>Course material, organized</b><span>Keep generated quizzes and source files together in one dependable
+              library.</span></div>
+        </div>
+        <div class="feat"><i>⟳</i>
+          <div><b>Progress that follows you</b><span>Answers, flags, and results save automatically as you study.</span>
+          </div>
+        </div>
+        <div class="foot"><a>Home</a> · <a>Read the study guide</a></div>
+      </div>
+      <div class="r">
+        <a id="back">← Back to dashboard</a>
+        <h2>Welcome back</h2>
+        <p class="mut" id="authsub">Sign in to continue your study session.</p>
+        <button class="btn line" style="width:100%" id="goog"><b style="color:#4285f4">G</b> Continue with
+          Google</button>
+        <div class="or">OR</div>
+        <label for="name" id="nameL" class="hide">Full name</label><input class="field hide" id="name"
+          placeholder="Your name">
+        <label for="email">Email</label><input class="field" id="email" type="email"
+          placeholder="student@university.edu">
+        <label for="pw">Password</label>
+        <div class="pw"><input class="field" id="pw" type="password" placeholder="Minimum 6 characters"><button id="eye"
+            aria-label="Show password">👁</button></div>
+        <div class="err" id="err"></div>
+        <button class="btn" style="width:100%;margin-top:.6rem" id="go">Log In</button>
+        <small class="auth-note">This standalone preview saves accounts and study data in this browser only. Secure sign-in cookies and cloud sync require a server. Use a unique password.</small>
+        <p style="text-align:center;margin-top:1.4rem"><a id="swap">New to Quizify? Create an account</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="app" class="hide">
+    <aside>
+      <div class="brand" style="margin-bottom:1.4rem"><span class="logo">✎</span>
+        <div>Quizify<small>Academy</small></div>
+      </div>
+      <button class="nav on" data-v="quizzes">▤ My Quizzes</button>
+      <button class="nav" data-v="analytics">▥ Analytics</button>
+      <button class="nav" data-v="gpa">↗ GPA Tracker</button>
+      <button class="nav" data-v="settings">⚙ Settings</button>
+      <div class="sp"></div>
+      <button class="btn" id="create">⬆ Create Quiz</button>
+      <button class="nav" id="mode">☾ Color Mode</button>
+      <button class="nav" id="out">⇥ Log Out</button>
+    </aside>
+    <main>
+      <div class="head">
+        <div>
+          <h2 id="hi">Good to see you</h2>
+          <p>Build a quiz from your course material or continue where you left off.</p>
+        </div>
+        <div class="card stor">
+          <div><span>Storage used</span><span id="st">0 B / 100.0 MB</span></div>
+          <div class="bar"><i id="stb"></i></div>
+        </div>
+      </div>
+
+      <div class="view on" id="v-quizzes" style="display:contents">
+        <div class="mats">
+          <div class="card up">
+            <div class="drop" id="drop">
+              <div class="ic">⬆</div>
+              <h3>Add course material</h3>
+              <p>Drop a PDF, DOCX, or TXT file here, or choose one from your device.</p>
+              <button class="btn" id="choose">Choose file</button><input type="file" id="file" accept=".pdf,.docx,.txt"
+                hidden>
+            </div>
+            <div class="opts">
+              <div class="two">
+                <div><label for="cnt">Question count</label><input class="field" id="cnt" type="number" min="1" max="30"
+                    value="10"></div>
+                <div><label for="dif">Difficulty</label><select class="field" id="dif">
+                    <option>Mixed</option>
+                    <option>Easy</option>
+                    <option>Medium</option>
+                    <option>Hard</option>
+                  </select></div>
+              </div>
+              <label for="mdl" style="margin-top:1rem">Model</label>
+              <select class="field" id="mdl">
+                <option>Gemini 2.5 Flash Lite</option>
+                <option>Gemini 2.5 Flash</option>
+                <option>Gemini 2.5 Pro</option>
+              </select>
+              <small>Free plan · 5 AI generations/day</small>
+            </div>
+          </div>
+          <div class="sec">
+            <h3>▭ My Materials</h3><span class="pill" id="fc">0 Files</span>
+          </div>
+          <div id="list">
+            <div class="empty"><b>Your quiz library is empty</b><span>Add course material above to create your first
+                quiz.</span></div>
+          </div>
+          <div id="quiz" style="margin-top:1.2rem"></div>
+        </div>
+        <div class="side">
+          <div class="card"><b>Quick Stats</b>
+            <div class="stat"><span>Total Quizzes</span><b id="s1">0</b></div>
+            <div class="stat"><span>Ready to Play</span><b id="s2">0</b></div>
+          </div>
+          <div class="card tk">
+            <div class="logo" style="background:var(--pri2);color:var(--pri)">🏛</div>
+            <h3>Study toolkit waitlist</h3>
+            <p>Request your university or vote for the study tool you want Quizify to add next.</p>
+            <label>Feature interest</label><select class="field">
+              <option>Add my university</option>
+              <option>Flashcards</option>
+              <option>Study planner</option>
+            </select>
+            <label>University name</label><input class="field" id="uni" placeholder="e.g. FAST NUCES"><small
+              style="color:var(--mut)">Write the official university name so we can review it.</small>
+            <button class="btn ghost" style="width:100%;margin-top:1rem" id="wl">➤ Join waitlist</button>
+          </div>
+        </div>
+      </div>
+      <div class="view" id="v-analytics">
+        <div class="card">
+          <h3>Analytics</h3>
+          <p>Your scores will appear here after you finish a quiz.</p>
+          <div id="an"></div>
+        </div>
+      </div>
+      <div class="view" id="v-gpa">
+        <div class="card">
+          <h3>GPA Tracker</h3>
+          <div class="two" style="max-width:420px"><input class="field" id="gc" placeholder="Course"><input
+              class="field" id="gcr" type="number" placeholder="Credit hrs"></div>
+          <select class="field" id="gg" style="max-width:200px;margin:.6rem 0">
+            <option value="4">A (4.0)</option>
+            <option value="3.67">A- (3.67)</option>
+            <option value="3.33">B+ (3.33)</option>
+            <option value="3">B (3.0)</option>
+            <option value="2.67">B- (2.67)</option>
+            <option value="2">C (2.0)</option>
+            <option value="1">D (1.0)</option>
+            <option value="0">F (0)</option>
+          </select><br>
+          <button class="btn" id="gadd">Add course</button>
+          <div id="gl" style="margin-top:1rem"></div>
+          <h3 id="gpa"></h3>
+        </div>
+      </div>
+      <div class="view" id="v-settings">
+        <div class="card">
+          <h3>Settings</h3>
+          <p>Signed in as <b id="se"></b>.</p><button class="btn ghost" id="clr">Clear all saved data</button>
+        </div>
+      </div>
+    </main>
+  </section>
+  <div class="toast hide" id="toast"></div>
+
+  <script>
+    const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+    const GOOGLE_CLIENT_ID = '';
+    const GOOGLE_AUTH_ENDPOINT = '/api/auth/google';
+    const GOOGLE_SESSION_ENDPOINT = '/api/auth/session';
+    const GOOGLE_LOGOUT_ENDPOINT = '/api/auth/logout';
+    const emptyData = () => ({ files: [], quizzes: [], scores: [], gpa: [] });
+    const dataKey = email => 'quizify.data.' + encodeURIComponent(email.toLowerCase());
+    let S = { user: null, ...emptyData() }, signup = false;
+    let accounts = {};
+    function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.remove('hide'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('hide'), 2400) }
+    function readJSON(key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+      } catch {
+        toast('Saved browser data could not be read. Clear this site’s storage and try again.');
+        return fallback;
+      }
+    }
+    function save() {
+      if (!S.user) return;
+      try {
+        localStorage.setItem(dataKey(S.user.email), JSON.stringify(emptyDataForSave()));
+        if (S.user.provider === 'google') localStorage.removeItem('quizify.session');
+        else localStorage.setItem('quizify.session', S.user.email.toLowerCase());
+      } catch {
+        toast('Could not save to this browser. Check available storage and try again.');
+      }
+    }
+    function emptyDataForSave() {
+      return { files: S.files, quizzes: S.quizzes, scores: S.scores, gpa: S.gpa };
+    }
+    function loadAccount(email) {
+      const account = accounts[email.toLowerCase()];
+      if (!account) throw new Error('This account is not registered in this browser.');
+      S = { ...emptyData(), ...readJSON(dataKey(email), emptyData()), user: { name: account.name, email: account.email, provider: 'local' } };
+      save();
+      show();
+    }
+    async function hashPassword(password, salt) {
+      if (!window.crypto || !crypto.subtle) throw new Error('Password sign-in requires a secure browser context (HTTPS or localhost).');
+      const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' }, key, 256);
+      return Array.from(new Uint8Array(bits), b => b.toString(16).padStart(2, '0')).join('');
+    }
+    function hexToBytes(hex) {
+      if (!/^(?:[0-9a-f]{2})+$/i.test(hex)) throw new Error('Invalid saved account data.');
+      return Uint8Array.from(hex.match(/.{2}/g), byte => parseInt(byte, 16));
+    }
+    async function createLocalAccount(name, email, password) {
+      const normalizedEmail = email.toLowerCase();
+      if (accounts[normalizedEmail]) throw new Error('An account with this email already exists in this browser.');
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const saltHex = Array.from(salt, b => b.toString(16).padStart(2, '0')).join('');
+      const passwordHash = await hashPassword(password, salt);
+      accounts[normalizedEmail] = { name, email: normalizedEmail, salt: saltHex, passwordHash };
+      localStorage.setItem('quizify.accounts', JSON.stringify(accounts));
+      loadAccount(normalizedEmail);
+    }
+    async function signInLocal(email, password) {
+      const account = accounts[email.toLowerCase()];
+      if (!account) throw new Error('No account with this email exists in this browser. Create an account first.');
+      const passwordHash = await hashPassword(password, hexToBytes(account.salt));
+      if (passwordHash !== account.passwordHash) throw new Error('Incorrect email or password.');
+      loadAccount(account.email);
+    }
+    function readGoogleResponse(response) {
+      if (!response.ok) throw new Error('Google sign-in could not be completed. Check the server setup and try again.');
+      return response.json().then(result => {
+        if (!result || !result.user || !result.user.email || !result.user.name) {
+          throw new Error('The sign-in server returned an invalid response.');
+        }
+        S = { ...emptyData(), ...readJSON(dataKey(result.user.email), emptyData()), user: { name: result.user.name, email: result.user.email, provider: 'google' } };
+        save();
+        show();
+      });
+    }
+    function continueWithGoogle() {
+      if (!GOOGLE_CLIENT_ID) {
+        $('#err').textContent = 'Google sign-in is not configured. Add a Google OAuth client ID and a server that verifies Google sign-in at ' + GOOGLE_AUTH_ENDPOINT + '.';
+        return;
+      }
+      if (!window.google || !google.accounts || !google.accounts.oauth2) {
+        $('#err').textContent = 'Google sign-in could not load. Check your internet connection and reload the page.';
+        return;
+      }
+      const client = google.accounts.oauth2.initCodeClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'openid email profile',
+        ux_mode: 'popup',
+        callback: async result => {
+          if (result.error || !result.code) {
+            $('#err').textContent = 'Google sign-in was cancelled or failed. Please try again.';
+            return;
+          }
+          try {
+            const response = await fetch(GOOGLE_AUTH_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ code: result.code })
+            });
+            await readGoogleResponse(response);
+          } catch (error) {
+            $('#err').textContent = error.message || 'Google sign-in failed.';
+          }
+        }
+      });
+      $('#err').textContent = '';
+      client.requestCode();
+    }
+    if (GOOGLE_CLIENT_ID) {
+      const googleScript = document.createElement('script');
+      googleScript.src = 'https://accounts.google.com/gsi/client';
+      googleScript.async = true;
+      googleScript.defer = true;
+      document.head.append(googleScript);
+    }
+    async function restoreGoogleSession() {
+      if (!GOOGLE_CLIENT_ID || S.user) return;
+      try {
+        const response = await fetch(GOOGLE_SESSION_ENDPOINT, { credentials: 'include' });
+        if (response.status === 401) return;
+        if (!response.ok) throw new Error('Could not check the Google sign-in session.');
+        const result = await response.json();
+        if (!result || !result.user || !result.user.email || !result.user.name) {
+          throw new Error('The sign-in server returned an invalid session.');
+        }
+        S = { ...emptyData(), ...readJSON(dataKey(result.user.email), emptyData()), user: { name: result.user.name, email: result.user.email, provider: 'google' } };
+        save();
+        show();
+      } catch (error) {
+        $('#err').textContent = error.message || 'Could not restore the Google sign-in session.';
+      }
+    }
+    accounts = readJSON('quizify.accounts', {});
+    if (!accounts || Array.isArray(accounts) || typeof accounts !== 'object') accounts = {};
+    let savedEmail = null;
+    try { savedEmail = localStorage.getItem('quizify.session'); }
+    catch { toast('Browser storage is unavailable. Saved accounts cannot be restored.'); }
+    if (savedEmail && accounts[savedEmail]) {
+      S = { ...emptyData(), ...readJSON(dataKey(savedEmail), emptyData()), user: { name: accounts[savedEmail].name, email: accounts[savedEmail].email, provider: 'local' } };
+    }
+    function theme() { const d = document.documentElement, dark = getComputedStyle(d).colorScheme === 'dark'; d.dataset.theme = dark ? 'light' : 'dark'; $('#theme').textContent = dark ? '☾' : '☀' }
+    $('#theme').onclick = theme; $('#mode').onclick = theme;
+    function show() {
+      const li = !!S.user; $('#login').classList.toggle('hide', li); $('#app').classList.toggle('hide', !li);
+      if (li) { $('#hi').textContent = 'Good to see you, ' + S.user.name; $('#se').textContent = S.user.email; render() }
+    }
+    function mode(s) {
+      signup = s; $('#nameL').classList.toggle('hide', !s); $('#name').classList.toggle('hide', !s);
+      $('.r h2').textContent = s ? 'Create your account' : 'Welcome back'; $('#go').textContent = s ? 'Create Account' : 'Log In';
+      $('#swap').textContent = s ? 'Already have an account? Log in' : 'New to Quizify? Create an account'
+    }
+    $('#swap').onclick = () => mode(!signup);
+    $('#eye').onclick = () => { const p = $('#pw'); p.type = p.type === 'password' ? 'text' : 'password' };
+    $('#back').onclick = () => { $('#err').textContent = 'Sign in to open your dashboard.' };
+    $('#go').onclick = async () => {
+      const e = $('#email').value.trim(), p = $('#pw').value, n = $('#name').value.trim();
+      if (!/^\S+@\S+\.\S+$/.test(e)) return $('#err').textContent = 'Enter a valid email address.';
+      if (p.length < 6) return $('#err').textContent = 'Password needs at least 6 characters.';
+      if (signup && !n) return $('#err').textContent = 'Enter your name.';
+      $('#err').textContent = '';
+      $('#go').disabled = true;
+      try {
+        if (signup) await createLocalAccount(n, e, p);
+        else await signInLocal(e, p);
+      } catch (error) {
+        $('#err').textContent = error.message || 'Could not sign in. Please try again.';
+      } finally {
+        $('#go').disabled = false;
+      }
+    };
+    $('#goog').onclick = continueWithGoogle;
+    $('#out').onclick = async () => {
+      if (S.user && S.user.provider === 'google') {
+        try {
+          const response = await fetch(GOOGLE_LOGOUT_ENDPOINT, { method: 'POST', credentials: 'include' });
+          if (!response.ok) throw new Error('Could not sign out of Google. Please try again.');
+        } catch (error) {
+          $('#err').textContent = error.message || 'Could not sign out of Google.';
+          return;
+        }
+      }
+      try { localStorage.removeItem('quizify.session'); }
+      catch { toast('Could not clear the saved sign-in from this browser.'); }
+      S = { user: null, ...emptyData() };
+      show();
+    };
+    $('#clr').onclick = () => { Object.assign(S, emptyData()); save(); render(); toast('Saved data cleared') };
+    $$('.nav[data-v]').forEach(b => b.onclick = () => {
+      $$('.nav[data-v]').forEach(x => x.classList.toggle('on', x === b));
+      $$('.view').forEach(v => { v.classList.remove('on'); v.style.display = '' }); const v = $('#v-' + b.dataset.v); v.classList.add('on'); if (b.dataset.v === 'quizzes') v.style.display = 'contents'; render()
+    });
+    $('#create').onclick = () => { $$('.nav[data-v]')[0].click(); $('#file').click() };
+    $('#choose').onclick = () => $('#file').click();
+    const drop = $('#drop');
+    ['dragover', 'dragenter'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('over') }));
+    ['dragleave', 'drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('over') }));
+    drop.addEventListener('drop', ev => add(ev.dataTransfer.files[0]));
+    $('#file').onchange = e => add(e.target.files[0]);
+    const fmt = b => b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
+    function removeFileData(fileId) {
+      S.quizzes = S.quizzes.filter(q => q.fileId !== fileId);
+      S.scores = S.scores.filter(s => s.fileId !== fileId);
+    }
+    async function add(f) {
+      if (!f) return; if (!/\.(pdf|docx|txt)$/i.test(f.name)) return toast('Use a PDF, DOCX, or TXT file.');
+      if (f.size > 100 * 1048576) return toast('File is over the 100 MB limit.');
+      let text = ''; if (/\.txt$/i.test(f.name)) text = (await f.text()).slice(0, 20000);
+      S.files.push({ name: f.name, size: f.size, text, id: Date.now() }); save(); render(); toast('Added ' + f.name)
+    }
+    function gen(id) {
+      const f = S.files.find(x => x.id === id); if (!f) return toast('File not found.');
+      const n = Math.min(30, Math.max(1, +$('#cnt').value || 10));
+      const sents = (f.text.match(/[^.!?\n]{40,160}[.!?]/g) || []).map(s => s.trim());
+      const words = [...new Set(sents.flatMap(s => s.split(/\W+/).filter(w => w.length > 6)))];
+      if (sents.length < 2) { toast('Only TXT files can be read in this demo. Add a TXT file with a few full sentences.'); return }
+      const qs = sents.slice(0, n).map(s => {
+        const ws = s.split(/\W+/).filter(w => w.length > 6); const a = ws[Math.floor(ws.length / 2)] || ws[0];
+        const d = words.filter(w => w !== a).sort(() => Math.random() - .5).slice(0, 3); const o = [a, ...d].sort(() => Math.random() - .5);
+        return { q: s.replace(a, '_____'), o, a: o.indexOf(a) }
+      });
+      S.quizzes.push({ id: Date.now(), fileId: f.id, title: f.name.replace(/\.\w+$/, ''), qs, model: $('#mdl').value, dif: $('#dif').value }); save(); render(); toast('Quiz ready: ' + qs.length + ' questions')
+    }
+    function play(id) {
+      const z = S.quizzes.find(x => x.id === id); if (!z) return toast('Quiz not found.'); let c = 0; const box = $('#quiz');
+      box.innerHTML = '<div class="card"><h3>' + z.title + '</h3><div id="qs"></div></div>';
+      z.qs.forEach((q, i) => {
+        const d = document.createElement('div'); d.className = 'q'; d.innerHTML = '<h4>' + (i + 1) + '. ' + q.q + '</h4>';
+        q.o.forEach((t, j) => {
+          const b = document.createElement('button'); b.className = 'o'; b.textContent = t; b.onclick = () => {
+            if (d.dataset.done) return; d.dataset.done = 1;
+            b.classList.add(j === q.a ? 'ok' : 'bad'); d.children[q.a + 1].classList.add('ok'); if (j === q.a) c++;
+            if ($$('#qs .q[data-done]').length === z.qs.length) { S.scores.push({ fileId: z.fileId, t: z.title, p: Math.round(100 * c / z.qs.length), d: new Date().toLocaleDateString() }); save(); toast('Score: ' + c + '/' + z.qs.length) }
+          }; d.append(b)
+        });
+        $('#qs').append(d)
+      }); box.scrollIntoView({ behavior: 'smooth' })
+    }
+    function render() {
+      const L = $('#list'), tot = S.files.reduce((a, f) => a + f.size, 0);
+      $('#fc').textContent = S.files.length + (S.files.length === 1 ? ' File' : ' Files'); $('#st').textContent = fmt(tot) + ' / 100.0 MB'; $('#stb').style.width = Math.min(100, tot / 1048576) + '%';
+      $('#s1').textContent = S.quizzes.length; $('#s2').textContent = S.quizzes.length;
+      L.innerHTML = S.files.length ? '' : '<div class="empty"><b>Your quiz library is empty</b><span>Add course material above to create your first quiz.</span></div>';
+      S.files.forEach(f => {
+        const r = document.createElement('div'); r.className = 'row'; const q = S.quizzes.filter(z => z.fileId === f.id);
+        r.innerHTML = '<div><b>' + f.name + '</b><small>' + fmt(f.size) + ' · ' + q.length + ' quiz' + (q.length === 1 ? '' : 'zes') + '</small></div><div style="display:flex;gap:.5rem"></div>';
+        const g = document.createElement('button'); g.className = 'btn'; g.textContent = 'Generate quiz'; g.onclick = () => gen(f.id); r.lastChild.append(g);
+        if (q.length) { const p = document.createElement('button'); p.className = 'btn ghost'; p.textContent = 'Play'; p.onclick = () => play(q[q.length - 1].id); r.lastChild.append(p) }
+        const x = document.createElement('button'); x.className = 'btn line'; x.textContent = 'Remove'; x.onclick = () => { S.files = S.files.filter(a => a.id !== f.id); removeFileData(f.id); save(); render() }; r.lastChild.append(x); L.append(r)
+      });
+      $('#an').innerHTML = S.scores.map(s => '<div class="row"><b>' + s.t + '</b><span>' + s.p + '% · ' + s.d + '</span></div>').join('');
+      const g = S.gpa; $('#gl').innerHTML = g.map(c => '<div class="row"><b>' + c.c + '</b><span>' + c.cr + ' cr · ' + c.g + '</span></div>').join('');
+      const cr = g.reduce((a, c) => a + c.cr, 0); $('#gpa').textContent = cr ? 'GPA: ' + (g.reduce((a, c) => a + c.cr * c.g, 0) / cr).toFixed(2) : ''
+    }
+    $('#gadd').onclick = () => {
+      const c = $('#gc').value.trim(), cr = +$('#gcr').value; if (!c || !cr) return toast('Enter a course and credit hours.');
+      S.gpa.push({ c, cr, g: +$('#gg').value }); save(); $('#gc').value = ''; $('#gcr').value = ''; render()
+    };
+    $('#wl').onclick = () => { if (!$('#uni').value.trim()) return toast('Enter your university name.'); toast('You joined the waitlist'); $('#uni').value = '' };
+    show();
+    restoreGoogleSession();
+  </script>
+</body>
+
+</html>
